@@ -10,6 +10,8 @@ SHELL ["/bin/bash", "--login", "-c"]
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 
+RUN  python3 -m pip install --upgrade pip
+
 RUN apt-get update --fix-missing && \
     apt-get install --no-install-recommends -y \
         nano \

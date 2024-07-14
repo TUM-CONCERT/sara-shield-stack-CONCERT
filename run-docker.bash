@@ -7,6 +7,6 @@ nvidia-docker run -it --gpus all \
  --volume="$HOME/.ssh:/home/user/.ssh:ro" \
  --mount type=bind,source=$SSH_AUTH_SOCK,target=/ssh-agent \
  --env SSH_AUTH_SOCK=/ssh-agent \
- --name concert_description_april2024 \
+ --name concert_with_sara_shield \
  jakobthumm/tum-concert:latest \
  x-terminal-emulator

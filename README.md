@@ -1,11 +1,18 @@
-# TUM-CONCERT-Docker
-Docker files for CONCERT Integration of TUM
+# sara-shield-stack-CONCERT
 
-### Related git repositories
+## Overview 
+
+[CONCERT](https://concertproject.eu/overview) is an EU project focussing on novel, configurable robots. TUM provides verifiable-safe algorithms to enable Human-robot interactions. This is mainly done using [SaRA](https://github.com/Sven-Schepp/SaRA), which calculates whether capsules around human parts intersect with a robot. These capsules grow depending on the human measurement uncertainty and frequency.
+The sara-shield is integrated over [xbot2](https://advrhumanoids.github.io/xbot2/) with robots. It can be used either in simulation or on a real robot. More information about the real Robot setup can be found [here](https://github.com/TUM-CONCERT/sara-shield-stack-CONCERT/blob/main/RealRobotTest.md).
+
+This Repository contains the Docker files for CONCERT Integration of TUM
+
+### Related Git Repositories
+ - This repo: Build instructions and Docker file, as well as Documentation,
  - [concert_description](https://github.com/ADVRHumanoids/concert_description): Includes all concert and xbot2 functionalities common for all partners.
- - [concert_msgs](https://github.com/ADVRHumanoids/concert_msgs): Defines the msgs send and received between packages.
- - [sara-shield](https://github.com/TUM-CONCERT/sara-shield-xbot2): Ensures human safety.
- - [multidof_recipes](https://github.com/TUM-CONCERT/sara_shield_forest_recipes): Forest recipes -- Pulls the git repos and defines how to build the packages.
+ - [concert_msgs](https://github.com/ADVRHumanoids/concert_msgs): Defines the msgs send and received between packages. It is mainly used to define a common message that describes human poses.
+ - [sara-shield-xbot2](https://github.com/TUM-CONCERT/sara-shield-xbot2): Ensures human safety by calculating reachable sets of the human and intersecting them with the robot. Takes goal joint positions or trajectories as input and outputs commands to move the robot safely. 
+ - [sara_shield_forest_recipes](https://github.com/TUM-CONCERT/sara_shield_forest_recipes): Contains [forest](https://pypi.org/project/hhcm-forest/) recipes. A recipes defines how git repos are pulled, which dependencies they have and how to build the packages.
  - [human-gazebo](https://github.com/TUM-CONCERT/human-gazebo): Animated human model in gazebo sending out joint measurements.
  - [rviz_plugin_sara_shield](https://github.com/TUM-CONCERT/rviz_plugin_sara_shield) : Visualize the sara-shield status in RVIZ and send sara shield commands
  - [rviz_plugin_humans](https://github.com/TUM-CONCERT/rviz_plugin_humans): Visualize concert_msgs/Humans messages in RVIZ directly.
@@ -58,12 +65,28 @@ tum_integration_ws
         └── sara-shield
 ```
 
-## BUILD AND RUN THE DOCKER CONTAINER
+# INSTALLATION
+
+## Build the docker container
 ```
 ./build-docker.bash --no-cache 
-./run-docker.bash
 ```
 Builds the image `jakobthumm/tum-concert:latest.`
+
+There will be red lines, but this is normal. At the end of a successful build, it should say
+```
+Successfully built <SOME_HASH>
+Successfully tagged jakobthumm/tum-concert:latest
+```
+Unsuccessful builds end with 
+```
+The command '/bin/bash -ic forest grow tum_src --verbose --jobs 4 --pwd user' returned a non-zero code: 1
+```
+
+## Run the docker container
+```
+./run-docker.bash
+```
 
 ## Inside Docker
 
@@ -77,8 +100,8 @@ roscore
 mon launch sara_shield concert.launch
 ```
 
-### Open `xbot2-Gui`
-**After** Gazebo runs, start Xbot2-Gui with
+### Open `xbot2-gui`
+**After** Gazebo runs, start Xbot2-GUI with
 ```
 xbot2-gui
 ```
@@ -134,7 +157,13 @@ rostopic pub /sara_shield/send_dummy_meas std_msgs/Bool "data: false"
 ```
 # Notes
 * The password for the user `user` is `user`
-* If something doesn't seem to be found, try re-sourcing tum_integration_ws/catkin_ws/devel/setup.bash and **then** tum_integration_ws/setup.bash
+* If something doesn't seem to be found, try re-sourcing 
+```
+cd tum_integration_ws/catkin_ws/
+source devel/setup.bash
+cd ..
+source setup.bash
+```
 
 # Known issues
 ## Laptop with Nvidia Graphics Card (`libGL error`)
@@ -159,7 +188,7 @@ rostopic pub /sara_shield/humans_in_scene std_msgs/Bool "data: false"
 ```
 
 ## Gravity compensation
-In order to compansate gravity, do the following steps:
+In order to compansate gravity in simulation, do the following steps:
 ```
 cd ~/tum_integration_ws/src/
 git clone git@github.com:ADVRHumanoids/xbot2_examples.git
