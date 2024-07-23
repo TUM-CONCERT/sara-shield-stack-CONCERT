@@ -66,8 +66,19 @@ tum_integration_ws
 ```
 
 # INSTALLATION
+## 1. Install `nvidia-docker2`
+Information can be found on [NVIDIA Docs](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/1.8.1/install-guide.html)
+But a common way to install it is
+```
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+   && curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - \
+   && curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+sudo apt-get update
+sudo apt-get install -y nvidia-docker2
 
-## Build the docker container
+```
+
+## 2. Build the docker container
 ```
 ./build-docker.bash --no-cache 
 ```
@@ -83,32 +94,40 @@ Unsuccessful builds end with
 The command '/bin/bash -ic forest grow tum_src --verbose --jobs 4 --pwd user' returned a non-zero code: 1
 ```
 
-## Run the docker container
+## 3. Run the docker container
 ```
 ./run-docker.bash
 ```
+This will open a new terminal that shows
+```
+USAGE:
+run simulation....: mon launch sara_shield concert.launch
+...
+```
 
-## Inside Docker
+## 4.0 Inside Docker
 
-### Start roscore
+### 4.1 Start roscore
 ```
 roscore
 ```
 
-### Start gazebo simulation
+### 4.2 Start gazebo simulation 
+In a new terminal( e.g., Ctrl + e) run
 ```
 mon launch sara_shield concert.launch
 ```
 
-### Open `xbot2-gui`
-**After** Gazebo runs, start Xbot2-GUI with
+### 4.3 Open `xbot2-gui`
+**After** Gazebo runs, start Xbot2-GUI in a new terminal (e.g., Ctrl + o)  with
 ```
 xbot2-gui
 ```
 This should open a large window with status "Running" in the top left corner. If it opens a small window with the status "Inactive" instead, close and rerun the command above.
+Then **start the safety-shield plugin** in the xbot2 gui. 
 
-### Open `rviz`
-**Open Rviz** for visualization 
+### 4.4 Open `rviz` 
+**Open Rviz** for visualization by running in a new terminal ( e.g., Ctrl + e)
 ```
 rviz -d $(rospack find sara_shield)/safety_shield/rviz/concert_sara_shield.rviz
 ```
@@ -116,9 +135,11 @@ Alternatively, run `rviz` and inside Rviz: go to the menu `File`, and select `Op
 
 The visualization topics of sara-shield are named ```/sara_shield/human_joint_marker_array``` and ```/sara_shield/robot_joint_marker_array``` and can be visualized by adding them in rviz.
 
-and then **start the safety-shield plugin** in the xbot2 gui. 
+### 4.5 
+If everything was successful, you should see something similar to this:
+![successfull installation](https://github.com/user-attachments/assets/9f6af20a-0a1f-4586-aa91-fb5e95b6c0e4)
 
-
+# Usage
 ## Send goal position:
 ```
 rostopic pub /sara_shield/goal_joint_pos std_msgs/Float32MultiArray "layout:
@@ -155,6 +176,13 @@ Don't send dummy measurements:
 ```
 rostopic pub /sara_shield/send_dummy_meas std_msgs/Bool "data: false"
 ```
+
+## Send no humans in scene
+To tell sara-shield that there are no more humans in the scene, send
+```
+rostopic pub /sara_shield/humans_in_scene std_msgs/Bool "data: false" 
+```
+
 # Notes
 * The password for the user `user` is `user`
 * If something doesn't seem to be found, try re-sourcing 
@@ -164,6 +192,7 @@ source devel/setup.bash
 cd ..
 source setup.bash
 ```
+
 
 # Known issues
 ## Laptop with Nvidia Graphics Card (`libGL error`)
@@ -181,13 +210,8 @@ If it says `on-demand`, switch to mode `nvidia` with
 sudo prime-select nvidia
 ```
 **Restart your computer**
-## Send no humans in scene
-To tell sara-shield that there are no more humans in the scene, send
-```
-rostopic pub /sara_shield/humans_in_scene std_msgs/Bool "data: false" 
-```
 
-## Gravity compensation
+# Gravity compensation
 In order to compansate gravity in simulation, do the following steps:
 ```
 cd ~/tum_integration_ws/src/
